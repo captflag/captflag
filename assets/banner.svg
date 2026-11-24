@@ -4,12 +4,12 @@
 <clipPath id="r"><rect width="840" height="260" rx="14"/></clipPath>
 <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2a5e"/><stop offset="0.45" stop-color="#7d3f8f"/><stop offset="0.8" stop-color="#f0705a"/><stop offset="1" stop-color="#ffc66e"/></linearGradient>
 <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9796c"/><stop offset=".18" stop-color="#2f8796"/></linearGradient>
-<linearGradient id="beach" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6dfae"/><stop offset="1" stop-color="#cab78f"/></linearGradient>
 <radialGradient id="halo"><stop offset="0" stop-color="#ffd98a" stop-opacity=".6"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
 <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6c8"/><stop offset=".5" stop-color="#ffb347"/></linearGradient>
 <clipPath id="above"><rect width="840" height="150"/></clipPath>
-<clipPath id="type"><rect x="40" y="110" height="22" width="0"><animate attributeName="width" begin=".6s" dur="0.91s" fill="freeze" calcMode="discrete" values="0;8.4;16.8;25.2;33.6;42.0;50.4;58.8;67.2;75.6;84.0;92.4;100.8;109.2"/></rect></clipPath>
-<filter id="sh" x="-10%" y="-30%" width="120%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1a1035" flood-opacity=".65"/></filter></defs>
+<filter id="sh" x="-10%" y="-30%" width="120%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1a1035" flood-opacity=".65"/></filter>
+<linearGradient id="beach" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6dfae"/><stop offset="1" stop-color="#cab78f"/></linearGradient>
+<clipPath id="type"><rect x="40" y="110" height="22" width="0"><animate attributeName="width" begin=".6s" dur="0.91s" fill="freeze" calcMode="discrete" values="0;8.4;16.8;25.2;33.6;42.0;50.4;58.8;67.2;75.6;84.0;92.4;100.8;109.2"/></rect></clipPath></defs>
 <style>
 text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif;fill:#17404d}
 .m{font-family:ui-monospace,SFMono-Regular,Consolas,'Liberation Mono',monospace}
@@ -22,12 +22,12 @@ text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif;fill:#17404
 .bob{animation:bob 3s ease-in-out infinite alternate}@keyframes bob{from{transform:translateY(-1.5px) rotate(-2deg)}to{transform:translateY(1.5px) rotate(2deg)}}
 .bub{animation:bub 2.4s ease-in infinite}@keyframes bub{from{opacity:.9}to{transform:translateY(-20px);opacity:0}}
 .tw{animation:tw 3s ease-in-out infinite}@keyframes tw{50%{opacity:.2}}
+.fly{animation:fly 46s linear infinite}@keyframes fly{from{transform:translateX(-40px)}to{transform:translateX(880px)}}
+.drift{animation:drift 14s ease-in-out infinite alternate}@keyframes drift{to{transform:translateX(26px)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 <g clip-path="url(#r)"><rect width="840" height="260" fill="url(#deep)"/>
 <style>
-.fly{animation:fly 46s linear infinite}@keyframes fly{from{transform:translateX(-40px)}to{transform:translateX(880px)}}
-.drift{animation:drift 14s ease-in-out infinite alternate}@keyframes drift{to{transform:translateX(26px)}}
 .cur{animation:bl 1s steps(1) infinite}@keyframes bl{50%{opacity:0}}
 text{fill:#fdf6e3}
 </style>

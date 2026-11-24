@@ -47,6 +47,8 @@ text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif;fill:${T.in
 .bob{animation:bob 3s ease-in-out infinite alternate}@keyframes bob{from{transform:translateY(-1.5px) rotate(-2deg)}to{transform:translateY(1.5px) rotate(2deg)}}
 .bub{animation:bub 2.4s ease-in infinite}@keyframes bub{from{opacity:.9}to{transform:translateY(-20px);opacity:0}}
 .tw{animation:tw 3s ease-in-out infinite}@keyframes tw{50%{opacity:.2}}
+.fly{animation:fly 46s linear infinite}@keyframes fly{from{transform:translateX(-40px)}to{transform:translateX(880px)}}
+.drift{animation:drift 14s ease-in-out infinite alternate}@keyframes drift{to{transform:translateX(26px)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 <g clip-path="url(#r)"><rect width="${w}" height="${h}" fill="url(#deep)"/>${body}</g>
@@ -55,6 +57,15 @@ text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif;fill:${T.in
 
 // ---- sprites (drawn around 0,0; `at` places them and optionally animates) -----
 const at = (x, y, s, inner, cls = '') => `<g transform="translate(${x},${y}) scale(${s})"><g class="${cls}">${inner}</g></g>`;
+
+// Sunset sky, sun, sea and text-shadow defs shared by the banner and the islands card.
+const skyDefs = (W, HZ) => `
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">${T.sky.map((c, i) => `<stop offset="${[0, 0.45, 0.8, 1][i]}" stop-color="${c}"/>`).join('')}</linearGradient>
+<linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9796c"/><stop offset=".18" stop-color="${T.sea[0]}"/></linearGradient>
+<radialGradient id="halo"><stop offset="0" stop-color="#ffd98a" stop-opacity=".6"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
+<linearGradient id="sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6c8"/><stop offset=".5" stop-color="#ffb347"/></linearGradient>
+<clipPath id="above"><rect width="${W}" height="${HZ}"/></clipPath>
+<filter id="sh" x="-10%" y="-30%" width="120%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1a1035" flood-opacity=".65"/></filter>`;
 
 // One 120px-period wave band filling down to the bottom of the card.
 const wave = (W, H, y, amp, fill, dur, rev) =>
@@ -102,8 +113,6 @@ function banner(d) {
   const gull = 'M0 0q4-5 8 0q4-5 8 0';
   return frame(W, H, `
 <style>
-.fly{animation:fly 46s linear infinite}@keyframes fly{from{transform:translateX(-40px)}to{transform:translateX(${W + 40}px)}}
-.drift{animation:drift 14s ease-in-out infinite alternate}@keyframes drift{to{transform:translateX(26px)}}
 .cur{animation:bl 1s steps(1) infinite}@keyframes bl{50%{opacity:0}}
 text{fill:${T.text}}
 </style>
@@ -133,15 +142,9 @@ ${wave(W, H, 243, 5, T.sea[4], 5.5)}
 <text x="40" y="96" class="b" font-size="40">${esc(d.name)}</text>
 <g clip-path="url(#type)"><text x="40" y="126" class="m" font-size="14" textLength="${(line.length * cw).toFixed(1)}">${esc(line)}</text></g>
 <rect class="cur" x="40" y="114" width="8" height="15" fill="${T.gold}"><animate attributeName="x" begin=".6s" dur="${dur}s" fill="freeze" calcMode="discrete" values="40;${steps.map(s => +s + 42).join(';')}"/></rect>
-</g>`, `
-<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">${T.sky.map((c, i) => `<stop offset="${[0, 0.45, 0.8, 1][i]}" stop-color="${c}"/>`).join('')}</linearGradient>
-<linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9796c"/><stop offset=".18" stop-color="${T.sea[0]}"/></linearGradient>
+</g>`, `${skyDefs(W, HZ)}
 <linearGradient id="beach" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${T.sand}"/><stop offset="1" stop-color="${shade(T.sand, 0.82)}"/></linearGradient>
-<radialGradient id="halo"><stop offset="0" stop-color="#ffd98a" stop-opacity=".6"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
-<linearGradient id="sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6c8"/><stop offset=".5" stop-color="#ffb347"/></linearGradient>
-<clipPath id="above"><rect width="${W}" height="${HZ}"/></clipPath>
-<clipPath id="type"><rect x="40" y="110" height="22" width="0"><animate attributeName="width" begin=".6s" dur="${dur}s" fill="freeze" calcMode="discrete" values="0;${steps.join(';')}"/></rect></clipPath>
-<filter id="sh" x="-10%" y="-30%" width="120%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1a1035" flood-opacity=".65"/></filter>`);
+<clipPath id="type"><rect x="40" y="110" height="22" width="0"><animate attributeName="width" begin=".6s" dur="${dur}s" fill="freeze" calcMode="discrete" values="0;${steps.join(';')}"/></rect></clipPath>`);
 }
 
 const title = t => `<rect x="24" y="24" width="3" height="14" fill="${T.coral}"/><text x="36" y="36" class="m cap">${t}</text>`;
@@ -202,41 +205,85 @@ function langs(d) {
     + (n ? boards : `<text x="24" y="100" class="mu" font-size="13">No public code yet</text>`));
 }
 
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// Things that stand on an island block, drawn up from 0,0.
+const TREE = `<path d="M0 0q-2-8 1-15" stroke="${T.trunk}" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="${['q-6-6-11 2', 'q6-6 11 2', 'q-4-8-10-6', 'q4-8 10-6', 'v-8'].map(l => `M1-15${l}`).join('')}" stroke="#0f6b45" stroke-width="2.4" stroke-linecap="round" fill="none"/>`;
+const FLAG = `<path d="M0 0v-18" stroke="${T.trunk}" stroke-width="1.6" stroke-linecap="round"/><path d="M.8-18l10 3.5l-10 3.5z" fill="${T.coral}"/>`;
+const BROLLY = `<path d="M0 0v-9" stroke="${T.text}" stroke-width="1.2"/><path d="M-6.5-8a6.5 6.5 0 0 1 13 0z" fill="${T.coral}"/><path d="M-2.2-8a2.2 6.5 0 0 1 4.4 0z" fill="${T.text}"/>`;
+const SAIL = `<path d="M-13 0h26l-5 6h-16z" fill="#4a2c17"/><path d="M-1-26v24h-13z" fill="${T.text}"/><path d="M1.5-21v19h10z" fill="${T.coral}"/>`;
+
+// The contribution calendar as an archipelago at sunset: every active day is a block of land,
+// taller and greener the busier it was. Busiest days grow a palm; the best day flies a flag.
 function islands(d) {
-  const W = 840, H = 340, ax = 13, ay = 2.5, dx = 7, dy = 6, s = 0.8, ox = 96, oy = 118;
+  const W = 840, H = 400, HZ = 92, SUN = 430, ax = 13.6, ay = 2.5, dx = 7, dy = 6.2, s = 0.8, ox = 84, oy = 178, N = d.weeks.length;
   const X = (w, dd) => +(ox + w * ax - dd * dx).toFixed(1), Y = (w, dd, z = 0) => +(oy + w * ay + dd * dy - z).toFixed(1);
   const P = (w, dd, z) => `${X(w, dd)},${Y(w, dd, z)}`;
-  const flat = d.weeks.flat(), nz = flat.filter(Boolean).sort((p, q) => p - q);
+  const foot4 = (w0, i0, w1, i1) => `${P(w0, i0)} ${P(w1, i0)} ${P(w1, i1)} ${P(w0, i1)}`; // sea-level quad
+  const flat = d.weeks.flat(), nz = flat.filter(Boolean).sort((p, q) => p - q), best = nz.at(-1) ?? 0;
   const q = p => nz[Math.floor(p * (nz.length - 1))] ?? 1;
   const cuts = [q(0.25), q(0.5), q(0.75)], cap = q(0.95);
   let longest = 0, run = 0;
   for (const c of flat) longest = Math.max(longest, (run = c ? run + 1 : 0));
   let current = 0;
   for (let i = flat.length - 1; i >= 0; i--) { if (flat[i]) current++; else if (i < flat.length - 1) break; } // today may still be empty
+  const byMonth = {};
+  d.weeks.forEach((wk, w) => wk.forEach((c, i) => { byMonth[d.ym[w][i]] = (byMonth[d.ym[w][i]] ?? 0) + c; }));
+  const topMonth = best ? MON[+Object.entries(byMonth).sort((p, r) => r[1] - p[1])[0][0].slice(5) - 1] : '-';
+
+  // Shores go under everything so neighbouring days merge into one island: foam ring, then sand.
+  const land = d.weeks.flatMap((wk, w) => wk.map((c, i) => (c ? [w, i] : 0))).filter(Boolean);
+  const shore = (e, attrs) => land.map(([w, i]) => `<polygon points="${foot4(w - e, i - e, w + s + e, i + s + e)}" ${attrs}/>`).join('');
+  let flagged = false;
   // Painter's order: week outer, day inner (later = nearer the viewer).
   const blocks = d.weeks.map((wk, w) => `<g class="in" style="animation-delay:${w * 18}ms">${wk.map((c, i) => {
-    const lv = c ? 1 + cuts.filter(t => c > t).length : 0, h = c ? 5 + 50 * Math.min(1, c / cap) : 0;
-    const col = lv ? T.levels[lv] : shade(T.levels[0], (w + i) % 2 ? 1 : 0.93);
-    const top = `<polygon points="${P(w, i, h)} ${P(w + s, i, h)} ${P(w + s, i + s, h)} ${P(w, i + s, h)}" fill="${col}"/>`;
-    if (!h) return top;
+    if (!c) return '';
+    const lv = 1 + cuts.filter(t => c > t).length, h = 5 + 50 * Math.min(1, c / cap), col = T.levels[lv];
     const cx = X(w + s / 2, i + s / 2), cy = Y(w + s / 2, i + s / 2, h);
-    const tree = lv < 4 ? '' : `<path d="M${cx} ${cy}q-2-8 1-15" stroke="${T.trunk}" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="${['q-6-6-11 2', 'q6-6 11 2', 'q-4-8-10-6', 'q4-8 10-6', 'v-8'].map(l => `M${cx + 1} ${cy - 15}${l}`).join('')}" stroke="#0f6b45" stroke-width="2.4" stroke-linecap="round" fill="none"/>`;
-    return `<polygon points="${P(w, i + s, h)} ${P(w + s, i + s, h)} ${P(w + s, i + s)} ${P(w, i + s)}" fill="${shade(col, 0.72)}"/><polygon points="${P(w + s, i, h)} ${P(w + s, i + s, h)} ${P(w + s, i + s)} ${P(w + s, i)}" fill="${shade(col, 0.5)}"/>${top}${tree}`;
+    const isBest = c === best && !flagged && (flagged = true);
+    const deco = isBest ? FLAG : lv === 4 ? `<g class="sway" style="animation-delay:-${(w * 7 + i) % 5}s">${TREE}</g>` : lv === 3 && (w + i) % 3 === 0 ? BROLLY : '';
+    return `<polygon points="${P(w, i + s, h)} ${P(w + s, i + s, h)} ${P(w + s, i + s)} ${P(w, i + s)}" fill="${shade(col, 0.72)}"/><polygon points="${P(w + s, i, h)} ${P(w + s, i + s, h)} ${P(w + s, i + s)} ${P(w + s, i)}" fill="${shade(col, 0.5)}"/><polygon points="${P(w, i, h)} ${P(w + s, i, h)} ${P(w + s, i + s, h)} ${P(w, i + s, h)}" fill="${col}"/>${deco && `<g transform="translate(${cx},${cy})">${deco}</g>`}`;
   }).join('')}</g>`).join('');
-  const foot = [['CURRENT STREAK', current + 'd'], ['LONGEST STREAK', longest + 'd'], ['BEST DAY', fmt(nz.at(-1) ?? 0)]].map(([l, v], i) =>
-    `<text x="${28 + i * 136}" y="290" class="b g" font-size="24">${v}</text><text x="${28 + i * 136}" y="308" class="cap">${l}</text>`).join('');
-  return frame(W, H, `${blocks}
-<ellipse cx="104" cy="238" rx="36" ry="3" fill="${shade(T.bg2, 0.85)}"/><g transform="rotate(-6 104 232)">${at(104, 232, 0.6, KAYAK)}</g>
-<text x="${W - 28}" y="38" class="m cap" text-anchor="end">CONTRIBUTION ISLANDS</text>
-<text x="${W - 28}" y="72" class="b g" font-size="30" text-anchor="end">${fmt(d.total)}</text>
-<text x="${W - 28}" y="92" class="mu" font-size="12" text-anchor="end">contributions in the last year</text>${foot}`);
+  // Month names run along the front edge, tilted to match it.
+  const tilt = (Math.atan2(ay, ax) * 180 / Math.PI).toFixed(1);
+  const months = d.ym.map((wk, w) => (w && wk[0] !== d.ym[w - 1][0] ? `<text x="${X(w, 7.2)}" y="${Y(w, 7.2) + 10}" transform="rotate(${tilt} ${X(w, 7.2)} ${Y(w, 7.2) + 10})" class="m" font-size="9" letter-spacing="1" fill-opacity=".8">${MON[+wk[0].slice(5) - 1].toUpperCase()}</text>` : '')).join('');
+  const foot = [['ACTIVE DAYS', nz.length], ['CURRENT STREAK', current + 'd'], ['LONGEST STREAK', longest + 'd'], ['BEST DAY', fmt(best)], ['BUSIEST MONTH', topMonth]].map(([l, v], i) =>
+    `<text x="${28 + i * 116}" y="356" class="b au" font-size="24">${v}</text><text x="${28 + i * 116}" y="374" class="cap" style="font-size:10px;letter-spacing:1px">${l}</text>`).join('');
+  const key = [1, 2, 3, 4].map((lv, i) => `<rect x="${W - 116 + i * 13}" y="365" width="10" height="10" rx="2" fill="${T.levels[lv]}"/>`).join('');
+  const glints = [40, 26, 32, 18, 24, 12].map((w, i) =>
+    `<rect class="tw" x="${SUN - w / 2}" y="${HZ + 9 + i * 9}" width="${w}" height="2" rx="1" style="animation-delay:-${(i * 0.7).toFixed(1)}s"/>`).join('');
+  const gull = 'M0 0q4-5 8 0q4-5 8 0';
+  return frame(W, H, `
+<style>text{fill:${T.text}}.cap,.mu{fill:#d5ecea}.au{fill:${T.gold}}.trip{animation:trip 38s ease-in-out infinite alternate}@keyframes trip{to{transform:translateX(190px)}}</style>
+<rect width="${W}" height="${HZ}" fill="url(#sky)"/>
+<g fill="#ffd9c2" opacity=".35"><rect class="drift" x="120" y="62" width="130" height="5" rx="2.5"/><rect class="drift" x="560" y="40" width="90" height="4" rx="2" style="animation-delay:-6s"/><rect class="drift" x="300" y="26" width="60" height="4" rx="2"/></g>
+<circle cx="${SUN}" cy="${HZ}" r="110" fill="url(#halo)"/>
+<circle cx="${SUN}" cy="${HZ}" r="34" fill="url(#sun)" clip-path="url(#above)"/>
+<g stroke="${T.text}" stroke-width="1.6" fill="none" stroke-linecap="round"><g transform="translate(0,22)"><path class="fly" d="${gull}"/></g><g transform="translate(0,38) scale(.7)"><path class="fly" d="${gull}" style="animation-delay:-4s"/></g><g transform="translate(0,30) scale(.55)"><path class="fly" d="${gull}" style="animation-delay:-21s"/></g></g>
+<rect y="${HZ}" width="${W}" height="${H - HZ}" fill="url(#water)"/>
+<path d="M640 ${HZ + 5}Q682 ${HZ - 20} 728 ${HZ + 5}Z" fill="${T.sand}"/>${palm(684, HZ - 5, 20, 4, 0.36)}
+${wave(W, H, HZ + 10, 1.5, T.sea[0], 16)}
+<g fill="#ffe2a0" opacity=".75">${glints}</g>
+<g class="drift" style="animation-duration:30s">${at(292, HZ + 30, 0.8, SAIL, 'bob')}</g>
+${wave(W, H, HZ + 30, 2.5, T.sea[1], 11, true)}
+${wave(W, H, HZ + 86, 3, T.sea[2], 9)}
+${wave(W, H, HZ + 160, 4, T.sea[3], 7, true)}
+<polygon points="${foot4(-0.7, -0.7, N + 0.5, 7.5)}" fill="${T.surf[0]}" opacity=".14"/>
+${shore(0.42, 'fill="#fff" opacity=".5"')}${shore(0.24, `fill="${T.sand}"`)}
+${blocks}
+<g class="trip"><ellipse cx="62" cy="305" rx="44" ry="2.5" fill="${T.sea[2]}" opacity=".7"/>${at(62, 300, 0.8, PADDLER, 'bob')}</g>
+${wave(W, H, H - 18, 4, T.sea[4], 5.5)}
+<g filter="url(#sh)">${months}
+<text x="${W - 28}" y="126" class="m cap" text-anchor="end">CONTRIBUTION ISLANDS</text>
+<text x="${W - 28}" y="160" class="b au" font-size="30" text-anchor="end">${fmt(d.total)}</text>
+<text x="${W - 28}" y="178" class="mu" font-size="12" text-anchor="end">contributions in the last year</text>
+${foot}<text x="${W - 122}" y="374" class="cap" text-anchor="end" style="font-size:10px;letter-spacing:1px">QUIET</text><text x="${W - 28}" y="374" class="cap" text-anchor="end" style="font-size:10px;letter-spacing:1px">BUSY</text></g>${key}`, skyDefs(W, HZ));
 }
 
 const QUERY = `query($login:String!){user(login:$login){
   name login bio followers{totalCount} pullRequests{totalCount} issues{totalCount}
   repositories(first:100,ownerAffiliations:OWNER,isFork:false,orderBy:{field:STARGAZERS,direction:DESC}){
     totalCount nodes{stargazerCount languages(first:10,orderBy:{field:SIZE,direction:DESC}){edges{size node{name color}}}}}
-  contributionsCollection{totalCommitContributions contributionCalendar{totalContributions weeks{contributionDays{contributionCount}}}}}}`;
+  contributionsCollection{totalCommitContributions contributionCalendar{totalContributions weeks{contributionDays{contributionCount date}}}}}}`;
 
 async function fetchData(login, token) {
   const res = await fetch('https://api.github.com/graphql', {
@@ -258,6 +305,7 @@ async function fetchData(login, token) {
     langs: all.slice(0, 6).map(l => ({ ...l, pct: 100 * l.size / sum })),
     total: u.contributionsCollection.contributionCalendar.totalContributions,
     weeks: u.contributionsCollection.contributionCalendar.weeks.map(w => w.contributionDays.map(x => x.contributionCount)),
+    ym: u.contributionsCollection.contributionCalendar.weeks.map(w => w.contributionDays.map(x => x.date.slice(0, 7))), // each day's year-month
   };
 }
 
@@ -271,6 +319,7 @@ function demoData() {
     stats: { Stars: 1284, Commits: 2310, PRs: 187, Issues: 64, Repos: 42, Followers: 356 },
     langs: [['Python', '#3572A5', 41.2], ['TypeScript', '#3178c6', 24.5], ['C#', '#178600', 14.1], ['HTML', '#e34c26', 9.8], ['GLSL', '#5686a5', 6.3], ['CSS', '#663399', 4.1]].map(([name, color, pct]) => ({ name, color, pct })),
     total: weeks.flat().reduce((p, q) => p + q, 0), weeks,
+    ym: weeks.map((wk, w) => wk.map((_, i) => new Date(Date.UTC(2025, 10, 23 + w * 7 + i)).toISOString().slice(0, 7))),
   };
 }
 
