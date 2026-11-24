@@ -13,7 +13,7 @@
 <style>
 text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif;fill:#17404d}
 .m{font-family:ui-monospace,SFMono-Regular,Consolas,'Liberation Mono',monospace}
-.mu{fill:#4a6c74}.g{fill:url(#g)}.b{font-weight:800}
+.mu{fill:#4a6c74}.g{fill:url(#g)}.b{font-weight:800}.w{fill:#fdf6e3;font-weight:600}
 .cap{font-size:11px;letter-spacing:1.5px;fill:#4a6c74}
 .in{animation:in .6s ease-out both}@keyframes in{from{opacity:0;transform:translateY(8px)}}
 .rise{transform-box:fill-box;transform-origin:50% 100%;animation:rise .9s cubic-bezier(.2,.8,.3,1) both}@keyframes rise{from{transform:scaleY(0)}}
