@@ -16,6 +16,14 @@ const T = {
   sand: '#f6dfae', trunk: '#7a4a2b', leaf: ['#178055', '#2aa36b'], kayak: '#ff5a3c', beer: '#f6a821',
   // contribution islands: lagoon water, then sand -> grass as a day gets busier (busiest grow a palm)
   levels: ['#3dbfc6', '#fff3d1', '#e8bd72', '#6cc57f', '#2aa36b'],
+  // tech stack card: group -> items, drawn as painted signs (edit freely; ~4 items fit per group)
+  stack: {
+    Languages: ['Python', 'TypeScript', 'JavaScript', 'SQL'],
+    'AI & LLMs': ['Claude API', 'Gemini API', 'MCP'],
+    Backend: ['FastAPI', 'Pydantic', 'Streamlit', 'pytest'],
+    Frontend: ['React', 'Vite', 'Tailwind CSS', 'Next.js'],
+  },
+  paint: ['#0e7c86', '#d9482b', '#178055', '#8a5a2b'], // sign colour per group, in order
 };
 // -----------------------------------------------------------------------------
 
@@ -30,7 +38,7 @@ const frame = (w, h, body, defs = '') => `<svg xmlns="http://www.w3.org/2000/svg
 <style>
 text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif;fill:${T.ink}}
 .m{font-family:ui-monospace,SFMono-Regular,Consolas,'Liberation Mono',monospace}
-.mu{fill:${T.muted}}.g{fill:url(#g)}.b{font-weight:800}
+.mu{fill:${T.muted}}.g{fill:url(#g)}.b{font-weight:800}.w{fill:${T.text};font-weight:600}
 .cap{font-size:11px;letter-spacing:1.5px;fill:${T.muted}}
 .in{animation:in .6s ease-out both}@keyframes in{from{opacity:0;transform:translateY(8px)}}
 .rise{transform-box:fill-box;transform-origin:50% 100%;animation:rise .9s cubic-bezier(.2,.8,.3,1) both}@keyframes rise{from{transform:scaleY(0)}}
@@ -138,7 +146,7 @@ ${wave(W, H, 243, 5, T.sea[4], 5.5)}
 
 const title = t => `<rect x="24" y="24" width="3" height="14" fill="${T.coral}"/><text x="36" y="36" class="m cap">${t}</text>`;
 // Surf along the bottom of a small card, with a sprite floating between the bands.
-const surf = (H, sprite) => wave(412, H, H - 34, 3, T.surf[0], 10) + wave(412, H, H - 24, 3, T.surf[1], 8, true) + sprite + wave(412, H, H - 12, 3, T.surf[2], 6);
+const surf = (W, H, sprite) => wave(W, H, H - 34, 3, T.surf[0], 10) + wave(W, H, H - 24, 3, T.surf[1], 8, true) + sprite + wave(W, H, H - 12, 3, T.surf[2], 6);
 
 // One beach icon per stat, drawn around 0,0 to sit inside an 18px-radius badge.
 const ICON = {
@@ -156,7 +164,27 @@ function stats(d) {
     const x = 24 + (i % 3) * 124, cy = 84 + Math.floor(i / 3) * 56;
     return `<g class="in" style="animation-delay:${i * 90}ms"><g transform="translate(${x + 18},${cy})"><circle r="18" fill="${T.surf[1]}" stroke="${T.surf[0]}" stroke-width="2"/>${ICON[label]}</g><text x="${x + 45}" y="${cy + 3}" class="b g" font-size="24">${fmt(n)}</text><text x="${x + 45}" y="${cy + 18}" class="cap" style="font-size:10px;letter-spacing:1px">${label.toUpperCase()}</text></g>`;
   }).join('');
-  return frame(412, H, title('STATS') + surf(H, at(372, H - 8, 0.6, BEER, 'bob')) + cells);
+  return frame(412, H, title('STATS') + surf(412, H, at(372, H - 8, 0.6, BEER, 'bob')) + cells);
+}
+
+// Tech stack as painted arrow signs, two groups per row. Not data-driven: edit T.stack.
+function stack() {
+  const W = 840, groups = Object.entries(T.stack), H = 102 + Math.ceil(groups.length / 2) * 64;
+  const body = groups.map(([name, items], g) => {
+    const gx = 28 + (g % 2) * 404, gy = 68 + Math.floor(g / 2) * 64, col = T.paint[g % T.paint.length];
+    let x = gx;
+    // ponytail: one row per group, no wrapping. Add wrapping if a group outgrows its half of the card.
+    const signs = items.map((label, i) => {
+      // Rough 13px semibold advance per character; textLength then pins the text to exactly this width.
+      const tw = +[...label].reduce((n, c) => n + (/[A-Z]/.test(c) ? 8.8 : /[mw]/.test(c) ? 10.6 : /[iljtf. ]/.test(c) ? 4.3 : 7.2), 0).toFixed(1), w = tw + 28;
+      const s = `<g transform="translate(${x.toFixed(1)},${gy + 10}) rotate(${i % 2 ? 1.2 : -1.2} ${w / 2} 14)"><path d="M3 0H${w}l9 14l-9 14H3a3 3 0 0 1-3-3V3a3 3 0 0 1 3-3Z" fill="${col}"/><path d="M5 4.5H${w - 1}" stroke="#fff" stroke-opacity=".25"/><circle cx="7.5" cy="14" r="1.7" fill="${shade(col, 0.6)}"/><text x="15" y="18.5" class="w" font-size="13" textLength="${tw}">${esc(label)}</text></g>`;
+      x += w + 18;
+      return s;
+    }).join('');
+    return `<g class="in" style="animation-delay:${g * 120}ms"><text x="${gx}" y="${gy}" class="cap">${esc(name.toUpperCase())}</text>${signs}</g>`;
+  }).join('');
+  const isle = `<path d="M750 ${H - 6}Q780 ${H - 34} 810 ${H - 6}Z" fill="${T.sand}"/>${palm(780, H - 17, 30, 4, 0.48)}`;
+  return frame(W, H, title('TECH STACK') + surf(W, H, isle) + body);
 }
 
 // Bar chart drawn as surfboards stuck in the sand: board height = language share, tallest = biggest.
@@ -254,7 +282,7 @@ const data = arg === '--demo' ? demoData() : await (() => {
 })();
 
 mkdirSync('assets', { recursive: true });
-for (const [name, svg] of Object.entries({ banner: banner(data), stats: stats(data), langs: langs(data), city: islands(data) })) {
+for (const [name, svg] of Object.entries({ banner: banner(data), stats: stats(data), langs: langs(data), city: islands(data), stack: stack() })) {
   assert(svg.startsWith('<svg') && svg.endsWith('</svg>') && !/undefined|NaN/.test(svg), `${name}.svg came out malformed`);
   writeFileSync(`assets/${name}.svg`, svg);
   console.log(`assets/${name}.svg  ${(svg.length / 1024).toFixed(1)} KB`);
