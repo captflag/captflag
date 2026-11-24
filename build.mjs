@@ -18,10 +18,10 @@ const T = {
   levels: ['#3dbfc6', '#fff3d1', '#e8bd72', '#6cc57f', '#2aa36b'],
   // tech stack card: group -> items, drawn as painted signs (edit freely; ~4 items fit per group)
   stack: {
-    Languages: ['Python', 'TypeScript', 'JavaScript', 'SQL'],
-    'AI & LLMs': ['Claude API', 'Gemini API', 'MCP'],
-    Backend: ['FastAPI', 'Pydantic', 'Streamlit', 'pytest'],
-    Frontend: ['React', 'Vite', 'Tailwind CSS', 'Next.js'],
+    LLMs: ['Claude', 'Gemini', 'OpenAI', 'Groq'],
+    'Agents & Automation': ['MCP', 'Google ADK', 'Pipecat', 'n8n'],
+    'Speech & Inference': ['Whisper', 'Kokoro TTS', 'ONNX Runtime'],
+    'Build & Ship': ['Python', 'FastAPI', 'TypeScript', 'React'],
   },
   paint: ['#0e7c86', '#d9482b', '#178055', '#8a5a2b'], // sign colour per group, in order
 };
@@ -184,10 +184,11 @@ function stack() {
       x += w + 18;
       return s;
     }).join('');
+    assert(x - 18 - gx <= 380, `stack group "${name}" is too wide for its half of the card; remove or shorten an item`);
     return `<g class="in" style="animation-delay:${g * 120}ms"><text x="${gx}" y="${gy}" class="cap">${esc(name.toUpperCase())}</text>${signs}</g>`;
   }).join('');
   const isle = `<path d="M750 ${H - 6}Q780 ${H - 34} 810 ${H - 6}Z" fill="${T.sand}"/>${palm(780, H - 17, 30, 4, 0.48)}`;
-  return frame(W, H, title('TECH STACK') + surf(W, H, isle) + body);
+  return frame(W, H, title('AI ENGINEERING STACK') + surf(W, H, isle) + body);
 }
 
 // Bar chart drawn as surfboards stuck in the sand: board height = language share, tallest = biggest.
